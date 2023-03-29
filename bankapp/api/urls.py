@@ -1,7 +1,6 @@
 from django.urls import path, include
 from .views import (IncomeViewSet, ExpensesViewSet, GoalsViewSet,
-                    WalletApiView, CustomerViewSet, TransferViewSet,
-                    AccountViewSet)
+                    CustomerViewSet, TransferViewSet, AccountViewSet)
 
 from rest_framework.routers import SimpleRouter
 
@@ -17,7 +16,6 @@ router.register(r'account', AccountViewSet, basename='account')
 
 urlpatterns = [
     path('v1/', include(router.urls)),
-    path('wallet/', WalletApiView.as_view()),
     path('auth/', include('djoser.urls')),
     path('auth/', include('djoser.urls.jwt')),
 ]
