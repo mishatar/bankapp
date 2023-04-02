@@ -4,10 +4,11 @@ from .serializers import (IncomeSerializer, ExpensesSerializer, GoalsSerializer,
                           CustomerSerializer, TransferSerializer, AccountSerializer)
 from rest_framework import generics, viewsets, mixins, status
 from rest_framework.views import APIView
+from rest_framework.decorators import action
 from .permissions import IsAdminOrReadOnly
 from rest_framework.permissions import IsAuthenticated
 from wallet.models import *
-from .services import calc_balance, make_transfer
+from .services import calc_balance, make_transfer, calc_exchange_rate
 
 
 class CustomerViewSet(viewsets.ModelViewSet):
@@ -34,7 +35,6 @@ class AccountViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         """Return object for current authenticated user only"""
-
         return self.queryset.filter(user=self.request.user)
 
 

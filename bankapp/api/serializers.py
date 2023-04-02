@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from wallet.models import *
-from .services import calc_balance
+from .services import calc_balance, calc_exchange_rate
 from django.shortcuts import get_object_or_404
 
 
@@ -18,14 +18,18 @@ class CustomerSerializer(serializers.ModelSerializer):
 
 class AccountSerializer(serializers.ModelSerializer):
 
+    balance_usd = serializers.SerializerMethodField('calc_exchange_rate_usd')
+    balance_eur = serializers.SerializerMethodField('calc_exchange_rate_eur')
+
+    def calc_exchange_rate_usd(self, obj):
+        return calc_exchange_rate(obj.balance, currency='usd')
+    
+    def calc_exchange_rate_eur(self, obj):
+        return calc_exchange_rate(obj.balance, currency='eur')
+
     class Meta:
         model = Account
-        fields = ('id', 'name', 'balance',)
-        # balance is read only, because i don't want someone create account
-        # with money
-        # read_only_fields = ('id', 'name', 'balance',)
-    
-    # def get(self, validated_data):
+        fields = ('id', 'name', 'balance', 'balance_usd', 'balance_eur')
 
 
 

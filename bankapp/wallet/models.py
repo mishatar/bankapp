@@ -19,11 +19,11 @@ class Customer(models.Model):
 class Account(models.Model):
     name = models.CharField(max_length=100)
 
-    balance = models.DecimalField(
-        default=0,
-        max_digits=12,
-        decimal_places=2
-    )
+    balance = models.IntegerField(default=0)
+
+    balance_usd = models.IntegerField(default=0)
+
+    balance_eur = models.IntegerField(default=0)
 
     user = models.ForeignKey(
         CustomUser,
@@ -87,10 +87,6 @@ class Goals(models.Model):
 
     def __str__(self):
         return self.name
-
-
-class Wallet(models.Model):
-    balance = models.IntegerField()
 
 
 class Transfer(models.Model):
