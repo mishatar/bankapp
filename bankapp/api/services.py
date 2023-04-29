@@ -1,12 +1,12 @@
 import requests
 from bs4 import BeautifulSoup
-from django.db.models import Sum
 
-from wallet.models import Income, Expenses, Transfer
+from wallet.models import Transfer
 from django.db import transaction
 
 
 def calc_rate(currency):
+    """ Парсинг валют с открытых источников. """
     if currency == "usd":
         URL = "https://www.google.com/search?q=%D0%B4%D0%BE%D0%BB%D0%BB%D0%B0%D1%80&oq=%D0%B4%D0%BE%D0%BB%D0%BB%D0%B0%D1%80&aqs=chrome..69i57j0i10i131i433i512l2j0i10i433i512j0i10i512l2j46i10i131i433i512j0i10i131i433i512l2j0i10i512.7270j1j15&sourceid=chrome&ie=UTF-8"
     elif currency == "eur":
@@ -31,6 +31,7 @@ def calc_exchange_rate(balance, currency):
 
 
 def calc_balance(account, sum, income=False, expenses=False):
+    """ Расчет текущего баланса. """
     if income:
         balance = account.balance + sum
         account.balance = balance

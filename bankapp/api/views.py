@@ -1,19 +1,16 @@
-from django.shortcuts import get_object_or_404, render
 from rest_framework.response import Response
 from .serializers import (IncomeSerializer, ExpensesSerializer, GoalsSerializer, 
                           CustomerSerializer, TransferSerializer, AccountSerializer)
-from rest_framework import generics, viewsets, mixins, status
-from rest_framework.views import APIView
-from rest_framework.decorators import action
-from .permissions import IsAdminOrReadOnly
+from rest_framework import viewsets, mixins, status
 from rest_framework.permissions import IsAuthenticated
 from wallet.models import *
-from .services import calc_balance, make_transfer, calc_exchange_rate
+from .services import calc_balance, make_transfer
 
 
 class CustomerViewSet(viewsets.ModelViewSet):
     queryset = Customer.objects.all()
     serializer_class = CustomerSerializer
+    permission_classes = (IsAuthenticated,)
 
     def perform_create(self, serializer):
         """Create a new customer"""
@@ -26,7 +23,7 @@ class CustomerViewSet(viewsets.ModelViewSet):
 
 class AccountViewSet(viewsets.ModelViewSet):
     serializer_class = AccountSerializer
-    permission_classes = (IsAuthenticated, )
+    permission_classes = (IsAuthenticated,)
     queryset = Account.objects.all()
 
     def perform_create(self, serializer):
@@ -41,18 +38,16 @@ class AccountViewSet(viewsets.ModelViewSet):
 class IncomeViewSet(viewsets.ModelViewSet):
     queryset = Income.objects.all()
     serializer_class = IncomeSerializer
+    permission_classes = (IsAuthenticated,)
 
     def get_queryset(self):
         """Return object for current authenticated user only"""
-        # get account of user
         accounts = Account.objects.filter(user=self.request.user)
         return self.queryset.filter(account__in=accounts)
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-
-        # check if requested account belongs to user
 
         try:
             account = Account.objects.filter(
@@ -72,18 +67,16 @@ class IncomeViewSet(viewsets.ModelViewSet):
 class ExpensesViewSet(viewsets.ModelViewSet):
     queryset = Expenses.objects.all()
     serializer_class = ExpensesSerializer
+    permission_classes = (IsAuthenticated,)
 
     def get_queryset(self):
         """Return object for current authenticated user only"""
-        # get account of user
         accounts = Account.objects.filter(user=self.request.user)
         return self.queryset.filter(account__in=accounts)
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-
-        # check if requested account belongs to user
 
         try:
             account = Account.objects.filter(
@@ -104,6 +97,7 @@ class ExpensesViewSet(viewsets.ModelViewSet):
 class GoalsViewSet(viewsets.ModelViewSet):
     queryset = Goals.objects.all()
     serializer_class = GoalsSerializer
+    permission_classes = (IsAuthenticated,)
 
     def perform_create(self, serializer):
         """Create a new income"""
@@ -114,11 +108,6 @@ class GoalsViewSet(viewsets.ModelViewSet):
         return self.queryset.filter(user=self.request.user)
 
 
-# class WalletApiView(APIView):
-#     def get(self, request):
-#         return Response({'balance': calc_balance(account=self.request.account)})
-
-
 class TransferViewSet(viewsets.GenericViewSet,
                       mixins.ListModelMixin,
                       mixins.CreateModelMixin,
@@ -126,6 +115,7 @@ class TransferViewSet(viewsets.GenericViewSet,
 
     serializer_class = TransferSerializer
     queryset = Transfer.objects.all()
+    permission_classes = (IsAuthenticated,)
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
@@ -143,6 +133,5 @@ class TransferViewSet(viewsets.GenericViewSet,
 
     def get_queryset(self):
         """Return object for current authenticated user only"""
-        # filter accounts by user
         accounts = Account.objects.filter(user=self.request.user)
         return self.queryset.filter(from_account__in=accounts)

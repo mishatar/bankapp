@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from wallet.models import *
-from .services import calc_balance, calc_exchange_rate
+from .services import calc_exchange_rate
 from django.shortcuts import get_object_or_404
 
 
